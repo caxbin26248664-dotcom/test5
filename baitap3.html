@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown Timer</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f5f5f5;
+}
+
+#timer {
+  font-size: 60px;
+  background: #222;
+  color: #fff;
+  padding: 20px 40px;
+  border-radius: 15px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.critical {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { color: red; transform: scale(1); }
+  25%, 75% { color: yellow; transform: scale(1.2); }
+}
+</style>
+</head>
+<body>
+
+<div id="timer">10:00</div>
+
+<script>
+let duration = 10 * 60; // 10 phút = 600 giây
+const timerEl = document.getElementById('timer');
+
+function formatTime(seconds){
+  const m = Math.floor(seconds/60).toString().padStart(2,'0');
+  const s = (seconds%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+timerEl.textContent = formatTime(duration);
+
+const interval = setInterval(()=>{
+  duration--;
+  
+  // Cập nhật hiển thị
+  timerEl.textContent = formatTime(duration);
+
+  // Animation khi dưới 1 phút
+  if(duration <= 60){
+    timerEl.classList.add('critical');
+  }
+
+  // Khi hết thời gian
+  if(duration <= 0){
+    clearInterval(interval); // stop interval để tránh memory leak
+    alert("⏰ Hết thời gian!");
+    timerEl.textContent = "00:00";
+  }
+}, 1000);
+</script>
+
+</body>
+</html>
+
+<!-- <p> 
+Giải thích 
+a) Xử lý interval để tránh memory leak
+Dùng setInterval để cập nhật timer mỗi 1 giây.
+Lưu reference interval vào biến (interval) để có thể clearInterval(interval)` khi hết thời gian.
+Điều này ngăn JS interval tiếp tục chạy vô tận, tránh memory leak.
+Không tạo nested interval nhiều lần → tránh trùng lặp và tăng load.
+b) Animation cảnh báo
+Khi còn dưới 1 phút (duration <= 60), thêm class critical.
+CSS @keyframes blink tạo màu đỏ, vàng nhấp nháy và phóng to → trực quan.
+c) Hiển thị alert
+Khi duration <= 0, dừng interval, hiện alert("Hết thời gian"), cập nhật hiển thị thành 00:00.
+d) Tích hợp với Domain/Hosting
+Deploy website lên GitHub Pages, Netlify hay server riêng → script JS chạy client-side.
+Đồng bộ thời gian với server nếu cần chuẩn xác:
+Lấy serverTime qua API khi load page.
+Tính endTime = serverTime + duration.
+Cập nhật timer dựa trên chênh lệch Date.now() → tránh gian lận đồng hồ local.
+Cần đảm bảo:
+JS chạy client-side không tạo interval trùng lặp khi reload SPA.
+Hosting cung cấp HTTPS để tránh lỗi khi fetch API thời gian server.
+</p>-->

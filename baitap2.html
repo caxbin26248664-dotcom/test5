@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Đăng Ký</title>
+<style>
+body { font-family: Arial; background:#f5f5f5; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;}
+.container { background:white; padding:20px; border-radius:10px; width:100%; max-width:350px; box-shadow:0 2px 10px rgba(0,0,0,0.2);}
+h2 { text-align:center; margin-bottom:15px;}
+input[type=text], input[type=email], input[type=password] { width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #bbb; }
+button { width:100%; padding:10px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer;}
+button:hover { background:#45a049;}
+.error { color:red; font-size:14px; margin-bottom:5px;}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Đăng ký</h2>
+  <form id="regForm">
+    <input type="text" id="name" placeholder="Tên" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <div id="emailErr" class="error"></div>
+    <input type="password" id="password" placeholder="Mật khẩu" required>
+    <div id="passErr" class="error"></div>
+    <label><input type="checkbox" id="terms"> Đồng ý điều khoản</label>
+    <div id="termsErr" class="error"></div>
+    <button type="submit">Đăng ký</button>
+  </form>
+</div>
+
+<script>
+const form = document.getElementById('regForm');
+const emailErr = document.getElementById('emailErr');
+const passErr = document.getElementById('passErr');
+const termsErr = document.getElementById('termsErr');
+
+function validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+function validPass(p){ return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(p);}
+
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+  emailErr.textContent = passErr.textContent = termsErr.textContent = '';
+  let valid = true;
+
+  if(!validEmail(form.email.value)){ emailErr.textContent='Email không hợp lệ!'; valid=false;}
+  if(!validPass(form.password.value)){ passErr.textContent='Mật khẩu ít nhất 8 ký tự, có chữ hoa, chữ thường và số!'; valid=false;}
+  if(!form.terms.checked){ termsErr.textContent='Bạn phải đồng ý điều khoản!'; valid=false;}
+
+  if(valid){
+    let users = JSON.parse(localStorage.getItem('users')||'[]');
+    users.push({name:form.name.value,email:form.email.value,password:form.password.value});
+    localStorage.setItem('users',JSON.stringify(users));
+
+    // Popup thông báo đăng ký thành công
+    alert('🎉 Đăng ký thành công!');
+
+    form.reset();
+  }
+});
+</script>
+
+</body>
+</html>
+
+<!-- <p>
+1. Xử lý sự kiện submit
+sự kiện submit của form:
+form.addEventListener('submit', function(e){ ... });
+Đây là cách ngăn hành vi mặc định của form, ví dụ reload trang, để chúng ta xử lý dữ liệu bằng JavaScript.
+2. Ngăn reload trang:
+e.preventDefault();
+Giữ trang ở trạng thái hiện tại để kiểm tra dữ liệu và hiển thị thông báo lỗi/thành công mà không load lại.
+3. Validation từng trường input:
+Email: kiểm tra format hợp lệ bằng regex.
+Password: ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số.
+Checkbox điều khoản: bắt buộc người dùng đồng ý.
+4. Hiển thị lỗi cụ thể:
+Mỗi trường có 1 div error riêng → người dùng biết ngay lỗi nào cần sửa.
+Xử lý thành công:
+Nếu tất cả hợp lệ, lưu dữ liệu vào LocalStorage và hiển thị thông báo thành công (alert hoặc modal).
+Reset form để người dùng nhập tiếp nếu muốn.
+</p> -->
